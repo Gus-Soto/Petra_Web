@@ -1,0 +1,955 @@
+import React, { useState, useEffect } from 'react';
+
+// --- Iconos de Lucide (simulados) ---
+// En un proyecto real, se importarían con `npm install lucide-react`
+// Aquí, los simulamos como componentes SVG simples para que funcione en un solo archivo.
+const Menu = (props) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <line x1="3" y1="12" x2="21" y2="12"></line>
+    <line x1="3" y1="6" x2="21" y2="6"></line>
+    <line x1="3" y1="18" x2="21" y2="18"></line>
+  </svg>
+);
+
+const X = (props) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <line x1="18" y1="6" x2="6" y2="18"></line>
+    <line x1="6" y1="6" x2="18" y2="18"></line>
+  </svg>
+);
+
+const MessageCircle = (props) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+  </svg>
+);
+
+const MapPin = (props) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
+    <circle cx="12" cy="10" r="3"></circle>
+  </svg>
+);
+
+const Phone = (props) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.63A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+  </svg>
+);
+
+const Mail = (props) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <rect width="20" height="16" x="2" y="4" rx="2"></rect>
+    <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+  </svg>
+);
+
+const Facebook = (props) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+  </svg>
+);
+
+const Instagram = (props) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect>
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+  </svg>
+);
+
+// --- ÍCONO DE WHATSAPP ---
+const WhatsAppIcon = (props) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" {...props}>
+    <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.451 0-9.887 4.434-9.889 9.886-.001 2.269.655 4.388 1.88 6.138l-.001.002 1.35 4.45-3.019.789zm7.398-5.897c-.197-.099-1.17-.578-1.353-.646-.182-.068-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.228.148-.418.05-.19-.098-1.108-.406-2.108-1.289-.793-.681-1.339-1.516-1.489-1.78-.15-.264-.08-.419.016-.548.098-.132.228-.347.342-.523.114-.176.151-.293.228-.488.077-.197.039-.372-.02-.471-.058-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007s-.369.049-.566.248c-.198.198-.765.748-.765 1.811s.787 2.101.898 2.234c.113.132 1.535 2.339 3.71 3.249.537.22 1.045.33 1.416.43.708.17 1.36.12 1.861-.09c.559-.22 1.17-.578 1.336-.693.166-.114.166-.208.114-.307s-.445-.514-.612-.693c-.161-.176-.324-.198-.445-.099z"/>
+  </svg>
+);
+
+
+// --- Componente ProductModal ---
+const ProductModal = ({ product, onClose }) => {
+  // Evitar que el clic dentro del modal lo cierre
+  const handleModalContentClick = (e) => {
+    e.stopPropagation();
+  };
+
+  return (
+    <div 
+      className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 animate-fadeIn"
+      onClick={onClose}
+    >
+      {/* Estilo para la animación de fade-in */}
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        .animate-fadeIn {
+          animation: fadeIn 0.3s ease-out;
+        }
+      `}</style>
+
+      <div 
+        className="bg-white rounded-lg shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto"
+        onClick={handleModalContentClick}
+      >
+        <div className="relative">
+          <img 
+            src={product.imageUrl} 
+            alt={product.altText} 
+            className="w-full h-64 object-cover rounded-t-lg"
+            onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/600x400/cccccc/333333?text=Imagen+no+disponible'; }}
+          />
+          <button 
+            onClick={onClose}
+            className="absolute top-4 right-4 bg-white/70 rounded-full p-2 text-gray-800 hover:bg-white transition-colors"
+            aria-label="Cerrar modal"
+          >
+            <X className="w-6 h-6" />
+          </button>
+        </div>
+
+        <div className="p-6 sm:p-8">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">{product.title}</h2>
+          <p className="text-lg text-gray-600 mb-6">{product.description}</p>
+          
+          <h3 className="text-xl font-semibold text-gray-900 mb-3">Especificaciones</h3>
+          <ul className="list-disc list-inside space-y-2 text-gray-600">
+            {product.specs.map((spec, index) => (
+              <li key={index}>{spec}</li>
+            ))}
+          </ul>
+
+          <button
+            onClick={() => {
+              onClose(); // Cierra el modal
+              document.getElementById('contact').scrollIntoView(); // Navega a contacto
+            }}
+            className="mt-8 w-full bg-green-700 hover:bg-green-800 text-white font-bold py-3 px-6 rounded-lg text-md transition-colors duration-300 shadow-lg shadow-green-500/30"
+          >
+            Cotizar este equipo
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
+// --- Componente Header (Navegación) ---
+const Header = () => {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const navLinks = [
+    { href: '#about', label: 'Nosotros' },
+    { href: '#brands', label: 'Marcas' },
+    { href: '#agricultural', label: 'Agrícola' },
+    { href: '#construction', label: 'Construcción' },
+    { href: '#contact', label: 'Contacto' },
+  ];
+
+  return (
+    <header className="bg-white/90 backdrop-blur-md shadow-sm sticky top-0 z-40 font-inter">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-20">
+          
+          {/* Logo */}
+          <a href="#" className="flex-shrink-0 flex items-center">
+            <img 
+              src="https://i.ibb.co/tNKj65j/Chat-GPT-Image-1-nov-2025-12-01-19-p-m.png" 
+              alt="Logo PETRAX" 
+              className="h-20 sm:h-24" // Duplicado de h-10 a h-20, h-12 a h-24
+              onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/150x80/ffffff/333333?text=PETRAX'; }}
+            />
+          </a>
+          
+          {/* Navegación de Escritorio */}
+          <nav className="hidden md:flex space-x-8">
+            {navLinks.map((link) => (
+              <a 
+                key={link.label}
+                href={link.href} 
+                className="text-gray-600 hover:text-green-700 font-medium transition-colors duration-200"
+              >
+                {link.label}
+              </a>
+            ))}
+          </nav>
+          
+          {/* Botón de Menú Móvil */}
+          <div className="md:hidden">
+            <button 
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="text-gray-700 hover:text-green-700"
+              aria-label="Abrir menú"
+            >
+              <Menu className="w-7 h-7" />
+            </button>
+          </div>
+
+        </div>
+      </div>
+      
+      {/* Menú Móvil */}
+      <div 
+        className={`md:hidden ${isMobileMenuOpen ? 'block' : 'hidden'} absolute top-full left-0 w-full bg-white shadow-lg z-50`}
+      >
+        <nav className="flex flex-col p-4 space-y-2">
+          {navLinks.map((link) => (
+            <a 
+              key={link.label}
+              href={link.href} 
+              onClick={() => setIsMobileMenuOpen(false)} // Cierra el menú al hacer clic
+              className="text-gray-700 hover:bg-green-50 hover:text-green-700 font-medium p-3 rounded-lg transition-colors duration-200"
+            >
+              {link.label}
+            </a>
+          ))}
+        </nav>
+      </div>
+    </header>
+  );
+};
+
+// --- Componente Hero ---
+const Hero = () => {
+  return (
+    <section 
+      id="hero" 
+      className="relative h-[60vh] min-h-[400px] sm:h-[70vh] md:h-[80vh] flex items-center justify-center text-center text-white bg-gray-800 overflow-hidden" // Añadido overflow-hidden
+    >
+      {/* Fondo de video en bucle */}
+      <div className="absolute z-0 inset-0 w-full h-full">
+        <iframe
+          src="https://streamable.com/e/x65667?autoplay=1&muted=1&loop=1" // <-- CÓDIGO DE STREAMABLE
+          frameBorder="0"
+          allow="autoplay; fullscreen"
+          allowFullScreen
+          style={{ 
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            width: '100vw', // Ancho de la ventana
+            height: '56.25vw', // Alto basado en 16:9 (9/16 * 100vw)
+            minHeight: '100vh', // Alto mínimo de la ventana
+            minWidth: '177.77vh', // Ancho mínimo basado en 16:9 (16/9 * 100vh)
+            transform: 'translate(-50%, -50%)',
+            pointerEvents: 'none',
+            opacity: 0.4
+          }}
+        ></iframe>
+        <div className="absolute inset-0 bg-gradient-to-t from-gray-900/50 via-transparent to-transparent"></div>
+      </div>
+      
+      {/* Contenido */}
+      <div className="relative z-10 p-4 font-inter">
+        <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold mb-4 leading-tight shadow-text">
+          Potencia y Eficiencia para su Proyecto
+        </h1>
+        <p className="text-lg sm:text-xl md:text-2xl font-light mb-8 max-w-3xl mx-auto shadow-text">
+          Representantes oficiales de Lovol. La mejor maquinaria agrícola y de construcción.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <a 
+            href="#agricultural" 
+            className="bg-green-700 hover:bg-green-800 text-white font-bold py-3 px-8 rounded-lg text-lg transition-colors duration-300 shadow-lg"
+          >
+            Ver Equipos
+          </a>
+          <a 
+            href="#contact" 
+            className="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white font-bold py-3 px-8 rounded-lg text-lg transition-colors duration-300 border border-white/50"
+          >
+            Contáctenos
+          </a>
+        </div>
+      </div>
+      
+      {/* Estilo para sombra de texto */}
+      <style>{`
+        .shadow-text {
+          text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+      `}</style>
+    </section>
+  );
+};
+
+// --- Componente About ---
+const About = () => {
+  return (
+    <section id="about" className="py-16 sm:py-24 bg-white font-inter">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid md:grid-cols-2 gap-12 items-center">
+          
+          {/* Imagen */}
+          <div className="rounded-lg overflow-hidden shadow-xl">
+            <img 
+              src="https://i.ibb.co/twt5hRBM/Chat-GPT-Image-31-oct-2025-10-28-55-p-m.png"
+              alt="Equipo de PETRAX" 
+              className="w-full h-full object-cover"
+              onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/600x450/cccccc/333333?text=Nosotros'; }}
+            />
+          </div>
+          
+          {/* Texto */}
+          <div>
+            <span className="text-green-700 font-semibold uppercase tracking-wider">Quiénes Somos</span>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mt-2 mb-6">
+              Su socio de confianza en maquinaria pesada
+            </h2>
+            <p className="text-lg text-gray-600 mb-6 leading-relaxed">
+              En PETRAX, somos más que distribuidores; somos sus socios estratégicos. Como representantes oficiales de Lovol, ofrecemos equipos de última generación diseñados para maximizar su productividad.
+            </p>
+            <p className="text-lg text-gray-600 mb-8 leading-relaxed">
+              Nuestro compromiso es brindar un servicio post-venta excepcional, repuestos garantizados y la asesoría técnica que su operación agrícola o de construcción necesita para no detenerse.
+            </p>
+            <a 
+              href="#contact" 
+              className="bg-green-700 hover:bg-green-800 text-white font-bold py-3 px-6 rounded-lg text-md transition-colors duration-300 shadow-lg shadow-green-500/30"
+            >
+              Solicitar Asesoría
+            </a>
+          </div>
+          
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// --- Componente de Tarjeta de Producto (Reutilizable) ---
+const ProductCard = ({ title, description, imageUrl, altText, onViewMore, variant = 'agricultural' }) => {
+  
+  // Define los estilos del botón según la variante
+  const buttonStyles = variant === 'construction'
+    ? 'text-[#f39c12] hover:text-[#e67e22]' // Naranja/Amarillo Lovol
+    : 'text-green-700 hover:text-green-800'; // Verde para agrícola
+
+  return (
+    <div className="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col transition-transform duration-300 hover:scale-[1.03]">
+      <img 
+        src={imageUrl} 
+        alt={altText} 
+        className="w-full h-56 object-cover"
+        onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/400x300/cccccc/333333?text=Equipo'; }}
+      />
+      <div className="p-6 flex-grow flex flex-col">
+        <h3 className="text-xl font-bold text-gray-900 mb-2">{title}</h3>
+        <p className="text-gray-600 mb-4 flex-grow">{description}</p>
+        <button 
+          onClick={onViewMore}
+          className={`mt-auto font-semibold transition-colors duration-200 self-start ${buttonStyles}`}
+        >
+          Ver más →
+        </button>
+      </div>
+    </div>
+  );
+};
+
+// --- Componente BrandsSection ---
+const BrandsSection = () => {
+  // Usamos las imágenes de los productos existentes para mantener la consistencia
+  const brands = [
+    {
+      division: 'Lovol Agrícola',
+      imageUrl: 'https://i.ibb.co/j9ryXzCf/P4000.jpg',
+      altText: 'Tractor Lovol Agrícola',
+      description: 'Tractores y maquinaria de alto rendimiento para el campo.',
+      link: '#agricultural',
+      buttonText: 'Ver Equipos Agrícolas',
+      buttonColor: 'bg-green-700 hover:bg-green-800 shadow-green-500/30', // Verde Petrax
+    },
+    {
+      division: 'Lovol Construcción',
+      imageUrl: 'https://i.ibb.co/5XvnS9F9/RETROEXCAVADOR-FB878-M.jpg',
+      altText: 'Excavadora Lovol Construcción',
+      description: 'Equipos robustos para excavación, carga y todo tipo de obra.',
+      link: '#construction',
+      buttonText: 'Ver Equipos de Construcción',
+      buttonColor: 'bg-[#f39c12] hover:bg-[#e67e22] shadow-yellow-500/30', // Naranja/Amarillo Lovol Const
+    }
+  ];
+
+  return (
+    <section id="brands" className="py-16 sm:py-24 bg-gray-50 font-inter">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 text-center mb-4 flex flex-col items-center justify-center gap-4">
+          <span>Somos Representantes Oficiales de</span>
+          <img 
+            src="https://i.ibb.co/yFJCb9fK/logo.png" 
+            alt="Logo Lovol" 
+            className="h-[108px] sm:h-[129px] md:h-[150px] lg:h-[174px]"
+            onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/150x40/ffffff/333333?text=LOVOL'; }}
+          />
+        </h2>
+        <p className="text-lg text-gray-600 text-center mb-12 max-w-2xl mx-auto">
+          Confíe en la calidad y el respaldo de una marca líder a nivel mundial.
+        </p>
+        
+        <div className="grid md:grid-cols-2 gap-8">
+          {brands.map((brand) => (
+            <div key={brand.division} className="bg-white rounded-lg shadow-lg overflow-hidden transition-transform duration-300 hover:scale-[1.03] flex flex-col">
+              {/* Imagen de fondo */}
+              <div className="relative h-64 w-full">
+                <img 
+                  src={brand.imageUrl} 
+                  alt={brand.altText} 
+                  className="w-full h-full object-cover"
+                  onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/600x400/cccccc/333333?text=Lovol'; }}
+                />
+                <div className="absolute inset-0 bg-black/40"></div>
+                
+              </div>
+              
+              {/* Contenido de la tarjeta */}
+              <div className="p-6 flex-grow flex flex-col">
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">{brand.division}</h3>
+                <p className="text-gray-600 mb-6 flex-grow">{brand.description}</p>
+                <a 
+                  href={brand.link}
+                  className={`mt-auto inline-block text-white font-bold py-3 px-6 rounded-lg text-md transition-colors duration-300 shadow-lg ${brand.buttonColor}`}
+                >
+                  {brand.buttonText}
+                </a>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// --- Componente AgriculturalSection ---
+const AgriculturalSection = ({ onProductSelect, products }) => { // Recibe 'products'
+  return (
+    <section id="agricultural" className="py-16 sm:py-24 bg-white font-inter">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 className="text-3xl sm:text-4xl font-extrabold text-green-700 text-center mb-4">
+          Equipos Agrícola
+        </h2>
+        <p className="text-lg text-gray-600 text-center mb-12 max-w-2xl mx-auto">
+          Equipos robustos y eficientes para cada tipo de cultivo, desde la preparación del terreno hasta la cosecha.
+        </p>
+        
+        <div className="grid md:grid-cols-3 gap-8">
+          {products.map((product) => ( // Usa 'products' de las props
+            <ProductCard 
+              key={product.title}
+              {...product}
+              onViewMore={() => onProductSelect(product)}
+              variant="agricultural"
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// --- Componente ConstructionSection ---
+const ConstructionSection = ({ onProductSelect, products }) => { // Recibe 'products'
+  return (
+    <section id="construction" className="py-16 sm:py-24 bg-gray-50 font-inter">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 className="text-3xl sm:text-4xl font-extrabold text-[#f39c12] text-center mb-4">
+          Equipos de Construcción
+        </h2>
+        <p className="text-lg text-gray-600 text-center mb-12 max-w-2xl mx-auto">
+          Maquinaria diseñada para resistir las condiciones más exigentes, garantizando rendimiento y durabilidad.
+        </p>
+        
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          {products.map((product) => ( // Usa 'products' de las props
+            <ProductCard 
+              key={product.title}
+              {...product}
+              onViewMore={() => onProductSelect(product)}
+              variant="construction"
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// --- Componente Contact ---
+const Contact = ({ agriculturalProducts, constructionProducts }) => { // Recibe listas de productos
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '', // NUEVO CAMPO
+    message: '',
+    equipment: ''
+  });
+  const [formStatus, setFormStatus] = useState(null); // 'success' o 'error'
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    if (name === 'equipment') {
+      // Si el usuario cambia el <select>
+      if (value === "") {
+        // Si selecciona "-- Seleccione --", limpiar el mensaje
+        setFormData((prev) => ({
+          ...prev,
+          equipment: value,
+          message: "" // Limpiar el mensaje
+        }));
+      } else {
+        // Si selecciona un equipo, rellenar el mensaje
+        const newMessage = `Hola,\n\nEstoy interesado/a en el equipo: ${value}.\n\n¿Podrían por favor enviarme una cotización y más detalles?\n\nMuchas gracias.`;
+        setFormData((prev) => ({
+          ...prev,
+          equipment: value,
+          message: newMessage // Rellenar el mensaje
+        }));
+      }
+    } else {
+      // Si cambia cualquier otro campo (nombre, email, mensaje manualmente)
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setFormStatus(null);
+
+    // URL del Webhook de n8n (REEMPLAZAR CON TU URL REAL)
+    const webhookUrl = "https://n8n-n8n.tnydnz.easypanel.host/webhook/WebPetrax";
+
+    // Mapear los datos del formulario al formato JSON deseado
+    const payload = {
+      Nombre: formData.name,
+      Email: formData.email,
+      Telefono: formData.phone, // NUEVO CAMPO
+      Mensaje: formData.message,
+      Equipo: formData.equipment
+    };
+
+    try {
+      const response = await fetch(webhookUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (response.ok) {
+        setFormStatus('success');
+        setFormData({ name: '', email: '', phone: '', message: '', equipment: '' }); // Limpiar formulario
+        setTimeout(() => setFormStatus(null), 3000);
+      } else {
+        console.error('Error del webhook, estado:', response.status, response.statusText);
+        throw new Error(`Error en el servidor del webhook: ${response.status}`);
+      }
+    } catch (error) {
+      console.error('Error al enviar el webhook:', error);
+      setFormStatus('error');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+
+  return (
+    <section id="contact" className="py-16 sm:py-24 bg-white font-inter">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 text-center mb-4">
+          Contáctenos
+        </h2>
+        <p className="text-lg text-gray-600 text-center mb-12 max-w-2xl mx-auto">
+          ¿Listo para empezar? Envíenos un mensaje o visítenos. Nuestro equipo está listo para asesorarle.
+        </p>
+        
+        <div className="grid md:grid-cols-2 gap-12 mt-12">
+          {/* Formulario */}
+          <div className="bg-white p-8 rounded-lg shadow-lg border border-gray-100">
+            <form onSubmit={handleSubmit}>
+              <div className="mb-4">
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+                <input
+                  type="text"
+                  name="name"
+                  id="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500"
+                />
+              </div>
+              <div className="mb-4">
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <input
+                  type="email"
+                  name="email"
+                  id="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500"
+                />
+              </div>
+
+              {/* --- NUEVO CAMPO TELEFONO --- */}
+              <div className="mb-4">
+                <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
+                <input
+                  type="tel"
+                  name="phone"
+                  id="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500"
+                />
+              </div>
+              {/* --- FIN DE NUEVO CAMPO --- */}
+
+              <div className="mb-4">
+                <label htmlFor="equipment" className="block text-sm font-medium text-gray-700 mb-1">Equipo de Interés (Opcional)</label>
+                <select
+                  name="equipment"
+                  id="equipment"
+                  value={formData.equipment}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 bg-white"
+                >
+                  <option value="">-- Seleccione un equipo --</option>
+                  <optgroup label="Equipos Agrícola">
+                    {agriculturalProducts.map(product => (
+                      <option key={product.title} value={product.title}>
+                        {product.title}
+                      </option>
+                    ))}
+                  </optgroup>
+                  <optgroup label="Equipos de Construcción">
+                    {constructionProducts.map(product => (
+                      <option key={product.title} value={product.title}>
+                        {product.title}
+                      </option>
+                    ))}
+                  </optgroup>
+                </select>
+              </div>
+
+              <div className="mb-4">
+                <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">Mensaje</label>
+                <textarea
+                  name="message"
+                  id="message"
+                  rows="4"
+                  value={formData.message}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500"
+                ></textarea>
+              </div>
+              <button
+                type="submit"
+                disabled={isSubmitting} // Deshabilitar mientras se envía
+                className="w-full bg-green-700 hover:bg-green-800 text-white font-bold py-3 px-6 rounded-lg text-md transition-colors duration-300 shadow-lg shadow-green-500/30 disabled:opacity-50 disabled:cursor-wait"
+              >
+                {isSubmitting ? 'Enviando...' : 'Enviar Mensaje'}
+              </button>
+              
+              {formStatus === 'success' && (
+                <p className="text-green-600 mt-4 text-center font-medium">¡Mensaje enviado con éxito!</p>
+              )}
+              {formStatus === 'error' && (
+                <p className="text-red-600 mt-4 text-center font-medium">Error al enviar. Verifique la URL o intente de nuevo.</p>
+              )}
+            </form>
+          </div>
+
+          {/* Información de Contacto */}
+          <div className="space-y-6">
+            <div className="flex items-start">
+              <div className="flex-shrink-0 bg-green-100 text-green-700 rounded-lg p-3">
+                <MapPin className="w-6 h-6" />
+              </div>
+              <div className="ml-4">
+                <h3 className="text-lg font-semibold text-gray-900">Nuestra Oficina</h3>
+                <p className="text-gray-600">San José, Costa Rica</p>
+                <p className="text-gray-600">Av. 51, Las Ánimas, Uruca, San Jose.</p>
+              </div>
+            </div>
+            <div className="flex items-start">
+              <div className="flex-shrink-0 bg-green-100 text-green-700 rounded-lg p-3">
+                <Phone className="w-6 h-6" />
+              </div>
+              <div className="ml-4">
+                <h3 className="text-lg font-semibold text-gray-900">Llámenos</h3>
+                <p className="text-gray-600">(+506) 6165-6859</p>
+                <p className="text-gray-600">Lunes - Viernes: 8:00 AM - 5:00 PM</p>
+              </div>
+            </div>
+            <div className="flex items-start">
+              <div className="flex-shrink-0 bg-green-100 text-green-700 rounded-lg p-3">
+                <Mail className="w-6 h-6" />
+              </div>
+              <div className="ml-4">
+                <h3 className="text-lg font-semibold text-gray-900">Email</h3>
+                <p className="text-gray-600">gsoto@petraxlatam.com</p>
+                <p className="text-gray-600">Envíenos sus consultas en cualquier momento</p>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// --- Componente Footer ---
+const Footer = () => {
+  return (
+    <footer className="bg-gray-800 text-gray-300 font-inter">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="flex flex-col md:flex-row justify-between items-center">
+          
+          <div>
+            <img 
+              src="https://i.ibb.co/tNKj65j/Chat-GPT-Image-1-nov-2025-12-01-19-p-m.png" 
+              alt="Logo PETRAX" 
+              className="h-20 sm:h-24 mb-4" // Duplicado de h-10 a h-20, h-12 a h-24
+              onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/150x80/ffffff/333333?text=PETRAX'; }}
+            />
+            <p className="mt-2 max-w-md">
+              Potencia y Eficiencia para su Proyecto.
+              Representantes oficiales de Lovol.
+            </p>
+          </div>
+          
+          <div className="flex space-x-6 mt-6 md:mt-0">
+            <a href="#" className="text-gray-400 hover:text-white transition-colors duration-200" aria-label="Facebook">
+              <Facebook className="w-6 h-6" />
+            </a>
+            <a href="#" className="text-gray-400 hover:text-white transition-colors duration-200" aria-label="Instagram">
+              <Instagram className="w-6 h-6" />
+            </a>
+          </div>
+
+        </div>
+        <hr className="my-8 border-gray-700" />
+        <div className="text-center text-gray-400 text-sm">
+          © {new Date().getFullYear()} PETRAX. Todos los derechos reservados.
+        </div>
+      </div>
+    </footer>
+  );
+};
+
+// --- Componente WhatsAppButton ---
+const WhatsAppButton = () => {
+  return (
+    // 1. Contenedor principal que detectará el hover (group)
+    <div className="fixed bottom-10 right-10 z-50 flex items-center group">
+      
+      {/* 2. El texto que aparece al pasar el cursor */}
+      <span className="bg-white text-gray-800 px-4 py-2 rounded-lg shadow-lg mr-4 
+                       opacity-0 group-hover:opacity-100 
+                       scale-0 group-hover:scale-100 
+                       transition-all duration-300 origin-right">
+        ¿Necesitas ayuda? Chatea con nosotros
+      </span>
+      
+      {/* 3. El botón de WhatsApp (ajustado) */}
+      <a 
+        href="https://wa.me/50661656859?text=Hola" // ACTUALIZADO EL NÚMERO
+        target="_blank" 
+        rel="noopener noreferrer"
+        className="w-[60px] h-[60px] bg-[#25d366] hover:bg-green-600 text-white rounded-full shadow-lg transition-transform duration-300 group-hover:scale-110 flex items-center justify-center"
+        aria-label="Contactar por WhatsApp"
+      >
+        <WhatsAppIcon className="w-8 h-8" />
+      </a>
+    </div>
+  );
+};
+
+
+// --- LISTAS DE PRODUCTOS ---
+const agriculturalProducts = [
+  {
+    title: 'Tractor LOVOL P4000 (90-110HP)',
+    description: 'Rango de potencia: (90-110HP)',
+    imageUrl: 'https://i.ibb.co/WpdN3Chs/P4000-1.jpg',
+    altText: 'Tractor agrícola Lovol Serie P4000',
+    specs: [
+      'Motor Weichai: WP4.6N, 4 cilindros, 4.58 L, 490 N·m',
+      'Transmisión: 12+12 o 18+18 (Sincronizador o Inversor)',
+      'Embrague: Doble acción (seco o húmedo)',
+      'Control: 4WD y bloqueo de diferencial (Eléctrico)',
+      'Toma de Fuerza (PTO): 540/1000 r/min',
+      'Cabina: Disponible en CAB (cerrada) o ROPS'
+    ]
+  },
+  {
+    title: 'Tractor LOVOL P5000 (130 HP)',
+    description: 'Motor Weichai de 130 HP',
+    imageUrl: 'https://i.ibb.co/GQdt9bnn/P5130-Ultra-Versatile-Tractor-1.jpg',
+    altText: 'Tractor Lovol Serie P5000',
+    specs: [
+      'Motor: Weichai WP4.6N, 4 cilindros, 4.6 L',
+      'Potencia: 130 hp (95.6 kW)',
+      'Par Máximo: 595 N·m',
+      'Transmisión: Power shift 45+15',
+      'Toma de Fuerza (PTO): 540/1000 r/min',
+      'Cabina: Con aire acondicionado y vistas panorámicas'
+    ]
+  },
+  {
+    title: 'Tractor LOVOL P7000 (240 HP)',
+    description: 'Motor Weichai WP7 de 240 HP',
+    imageUrl: 'https://i.ibb.co/Ld5DqtJx/P7000.jpg',
+    altText: 'Tractor Lovol de alta potencia Serie P7000',
+    specs: [
+      'Motor: Weichai WP7, 6 cilindros, 7.47 L',
+      'Potencia: 240 hp',
+      'Par Máximo: 1114 N·m',
+      'Transmisión: CVT (Variable Continua) 0-40 km/h',
+      'Tanque de Combustible: 420 L',
+      'Cabina: 4 pilares, amortiguada, visión 360°'
+    ]
+  }
+];
+
+const constructionProducts = [
+  {
+    title: 'Miniexcavadora FR60E2-H (6t)',
+    description: 'Eficiencia y precisión, motor YANMAR 4TNV94L.',
+    imageUrl: 'https://i.ibb.co/5WFWDnkZ/MINIEXCAVADORA-FR60.jpg',
+    altText: 'Miniexcavadora Lovol FR60E2-H',
+    specs: [
+      'Motor: YANMAR 4TNV94L (36.2 kW)',
+      'Cilindrada: 3.054 L (4 cilindros)',
+      'Par Máximo: 198 N·m / 1400 rpm',
+      'Capacidad de Cuchara: 0.23 m³',
+      'Fuerza Excav. Cuchara: 50 kN',
+      'Fuerza Excav. Brazo: 31 kN'
+    ]
+  },
+  {
+    title: 'Miniexcavadora FR80E2 (8t)',
+    description: 'Compacta y ágil, motor YANMAR 4TNV98.',
+    imageUrl: 'https://i.ibb.co/tMVDMCgk/MINIEXCAVADORA-FR80.jpg',
+    altText: 'Miniexcavadora Lovol FR80E2',
+    specs: [
+      'Motor: YANMAR 4TNV98 (44.4 kW)',
+      'Cilindrada: 3.32 L (4 cilindros)',
+      'Par Máximo: 237 N·m / 1400 rpm',
+      'Capacidad de Cuchara: 0.3 m³',
+      'Fuerza Excav. Cuchara: 56 kN',
+      'Velocidad de Giro: 11.5 r/min'
+    ]
+  },
+  {
+    title: 'Excavadora FR130E2-H (13t)',
+    description: 'Fiabilidad, motor Cummins o Weichai.',
+    imageUrl: 'https://i.ibb.co/LhJxLGCC/EXCAVADORA-FR130-E.jpg',
+    altText: 'Excavadora Lovol FR130E2-H',
+    specs: [
+      'Motor: Cummins QSF3.8 (86 kW) o Weichai WP4.1 (92 kW)',
+      'Cilindrada: 3.76L o 4.1L',
+      'Par Máximo: 480 N·m o 470 N·m',
+      'Capacidad de Cuchara: 0.5 m³ - 0.56 m³',
+      'Fuerza Excav. Cuchara: 91 kN',
+      'Fuerza Máx. Tracción: 115 kN'
+    ]
+  },
+  {
+    title: 'Excavadora FR150E2 (15t)',
+    description: 'Motor Cummins QSF3.8.',
+    imageUrl: 'https://i.ibb.co/v75jMFR/FR150E2.jpg',
+    altText: 'Excavadora Lovol FR150E2',
+    specs: [
+      'Motor: Cummins QSF3.8 (86 kW)',
+      'Cilindrada: 3.8 L (4 cilindros)',
+      'Par Máximo: 470 N·m (1100-1700 rpm)',
+      'Capacidad de Cuchara: 0.6 m³',
+      'Fuerza Excav. Cuchara: 101 kN',
+      'Fuerza Máx. Tracción: 115 kN'
+    ]
+  },
+  {
+    title: 'Excavadora FR200E2 (20t)',
+    description: 'Potencia superior, motor ISUZU 4HK1.',
+    imageUrl: 'https://i.ibb.co/s0k4GdS/EXCAVADORA-FR200-F.jpg',
+    altText: 'Excavadora Lovol FR200E2',
+    specs: [
+      'Motor: ISUZU 4HK1 (133 kW)',
+      'Cilindrada: 5.193 L (4 cilindros)',
+      'Par Máximo: 657 N·m / 1500 rpm',
+      'Capacidad de Cuchara: 0.96 m³',
+      'Fuerza Excav. Cuchara: 156 kN',
+      'Fuerza Máx. Tracción: 217 kN'
+    ]
+  },
+  {
+    title: 'Retroexcavadora FB878M',
+    description: 'Motor WEICHAI WP4.1G100E311 Supercargador',
+    imageUrl: 'https://i.ibb.co/5XvnS9F9/RETROEXCAVADORA-FB878-M.jpg',
+    altText: 'Retroexcavadora Lovol FB878M',
+    specs: [
+      'Motor: WEICHAI WP4.1G100E311 (74 kW)',
+      'Cilindrada: 4.088 L (4 cilindros)',
+      'Par Máximo: 420 N·m',
+      'Sist. Hidráulico: Detección de carga (25 MPa)',
+      'Balde Cargador: 1.0 m³',
+      'Balde Excavador: 0.18 m³'
+    ]
+  }
+];
+
+// --- Componente Principal (App) ---
+// Anteriormente 'Index', renombrado a 'App' para ser el componente raíz
+export default function App() {
+  // El <Helmet> se manejaría a nivel de `index.html` o con un router
+  
+  // Estado para manejar el modal
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  
+  // Habilitar smooth scroll
+  useEffect(() => {
+    document.documentElement.style.scrollBehavior = 'smooth';
+    // Limpiar el estilo al desmontar
+    return () => {
+      document.documentElement.style.scrollBehavior = 'auto';
+    };
+  }, []);
+
+  return (
+    <div className="flex flex-col min-h-screen">
+      <Header />
+      
+      <main className="flex-grow">
+        <Hero />
+        <About />
+        <BrandsSection />
+        <AgriculturalSection onProductSelect={setSelectedProduct} products={agriculturalProducts} />
+        <ConstructionSection onProductSelect={setSelectedProduct} products={constructionProducts} />
+        <Contact agriculturalProducts={agriculturalProducts} constructionProducts={constructionProducts} />
+      </main>
+      
+      <Footer />
+      <WhatsAppButton />
+      
+      {/* Renderiza el modal si un producto está seleccionado */}
+      {selectedProduct && (
+        <ProductModal 
+          product={selectedProduct} 
+          onClose={() => setSelectedProduct(null)} 
+        />
+      )}
+    </div>
+  );
+}
+
